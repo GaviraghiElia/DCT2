@@ -21,8 +21,8 @@ def load_image():
         m = min(img.height, img.width)
         F_slider.configure(from_=1, to=m)
         d_slider.configure(from_=1, to=m - 2)
-        F_slider.set(int(m / 2))
-        d_slider.set(int(m / 2) - 2)
+        F_slider.set(int(m / 3))
+        d_slider.set(int(m / 3) - 2)
 
         # peso dell'immagine caricata
         original_size = os.path.getsize(file_path)
@@ -62,7 +62,7 @@ def compress_button_clicked(image_path):
     filename = os.path.splitext(os.path.basename(image_path))[0]
 
     # Salva nella cartella "Compressed"
-    save_folder = "Compressed"
+    save_folder = "Images"
     if not os.path.exists(save_folder):
         # se non esiste creala
         os.makedirs(save_folder)
