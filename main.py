@@ -6,7 +6,7 @@ from tkinter import ttk
 from tkinter import filedialog
 from PIL import Image, ImageTk
 import numpy as np
-from scipy.fftpack import dctn, idctn
+from scipy.fft import dctn, idctn
 from ttkthemes import ThemedTk
 
 def load_image():

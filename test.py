@@ -1,12 +1,12 @@
-import math
 import time
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from scipy.fftpack import dctn, dct
+from scipy.fft import dctn, dct
 import seaborn as sns
 
+import mydct
 import mydct2
 
 def test_dct():
@@ -16,7 +16,7 @@ def test_dct():
     print(dct(vector, norm='ortho'))
 
     print("\n test my dct")
-    print(mydct2.dct(vector))
+    print(mydct.dct(vector))
 
 def test_dctn():
     print("\n\n test open dctn2")
@@ -82,5 +82,5 @@ sns.set_style('darkgrid')
 test_dct()
 test_dctn()
 
-results = performance_test(10, 25, 10)
-plot_results(results)
+#results = performance_test(10, 25, 10)
+#plot_results(results)
