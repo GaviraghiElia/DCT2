@@ -32,7 +32,7 @@ def load_image():
         compressed_size_label.configure(text="Compressed Size:")
 
         # Mostra l'immagine nella GUI
-        img.thumbnail((800, 800))  # Ridimensiona l'immagine per adattarla alla GUI
+        img.thumbnail((500, 500))  # Ridimensiona l'immagine per adattarla alla GUI
         img_tk = ImageTk.PhotoImage(img)
         img_label.configure(image=img_tk)
         img_label.image = img_tk
@@ -77,7 +77,7 @@ def compress_button_clicked(image_path):
     compressed_size_label.configure(text=f"Compressed Size: {format_size(compressed_size)}")
 
     # Mostra l'immagine compressa nella GUI
-    compressed_img.thumbnail((800, 800))  # Ridimensiona l'immagine per adattarla alla GUI
+    compressed_img.thumbnail((500, 500))  # Ridimensiona l'immagine per adattarla alla GUI
     compressed_img_tk = ImageTk.PhotoImage(compressed_img)
     compressed_img_label.configure(image=compressed_img_tk)
     compressed_img_label.image = compressed_img_tk
@@ -113,12 +113,9 @@ def compress_image(image_path, F, d):
     # Trasforma l'immagine in un array
     img_arr = np.array(img, dtype=np.float32)
 
-    # nuovo array dove inseriremo l'immagine compressa
-    # i bit non compressi vengono ricopiati con questa semplice linea di codice
-    compressed_arr = img_arr
-
-    # nel caso non volessimo copiare ma croppare
-    #compressed_arr = np.zeros((new_height, new_width), dtype=np.float32)
+    # pre-allochiamo un array numpy di 0
+    # l'immagine in output verrà croppata
+    compressed_arr = np.zeros((new_height, new_width), dtype=np.float32)
 
     # Applica la compressione per ogni blocco
     for i in range(num_blocks_h):
