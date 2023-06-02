@@ -29,14 +29,12 @@ def load_image():
         original_size_label.configure(text=f"Original Size: {format_size(original_size)}")
         # reset dei tempi in caso di caricamento non iniziale
         compressed_time_label.configure(text="Compressed Time: ")
-        compressed_size_label.configure(text="Compressed Size:")
 
         # Mostra l'immagine nella GUI
-        img.thumbnail((500, 500))  # Ridimensiona l'immagine per adattarla alla GUI
+        img.thumbnail((1000, 1000))  # Ridimensiona l'immagine per adattarla alla GUI
         img_tk = ImageTk.PhotoImage(img)
         img_label.configure(image=img_tk)
         img_label.image = img_tk
-
 
         # abilitazione bottone per la compressione
         compress_button.configure(state=tk.NORMAL)  # Abilita il pulsante di compressione
@@ -61,23 +59,8 @@ def compress_button_clicked(image_path):
     #get name
     filename = os.path.splitext(os.path.basename(image_path))[0]
 
-    # Salva nella cartella "Compressed"
-    save_folder = "Images"
-    if not os.path.exists(save_folder):
-        # se non esiste creala
-        os.makedirs(save_folder)
-
-    # salva in formato .bmp
-    save_path = os.path.join(save_folder, f"{filename}_compressed.bmp")
-    compressed_img.save(save_path)
-    print(f"Compressed image saved: {save_path}")
-
-    # Peso dell'immagine compressa
-    compressed_size = os.path.getsize(save_path)
-    compressed_size_label.configure(text=f"Compressed Size: {format_size(compressed_size)}")
-
     # Mostra l'immagine compressa nella GUI
-    compressed_img.thumbnail((500, 500))  # Ridimensiona l'immagine per adattarla alla GUI
+    compressed_img.thumbnail((1000, 1000))  # Ridimensiona l'immagine per adattarla alla GUI
     compressed_img_tk = ImageTk.PhotoImage(compressed_img)
     compressed_img_label.configure(image=compressed_img_tk)
     compressed_img_label.image = compressed_img_tk
@@ -137,7 +120,7 @@ def compress_image(image_path, F, d):
             # Aggiungi il blocco compresso all'immagine finale
             compressed_arr[i * F : (i + 1) * F, j * F : (j + 1) * F] = idctn_block
 
-            # Arrotonda i valori e li limita nell'intervallo 0-255
+    # Arrotonda i valori e li limita nell'intervallo 0-255
     compressed_arr = np.round(compressed_arr).clip(0, 255)
 
     # Convert the compressed array back to PIL Image
@@ -171,10 +154,6 @@ image_frame.pack()
 # Display the original image size
 original_size_label = ttk.Label(root, text="Original Size: ")
 original_size_label.pack(padx=10, pady=(0, 5))
-
-# Display the compressed image size
-compressed_size_label = ttk.Label(root, text="Compressed Size: ")
-compressed_size_label.pack(padx=10, pady=(0, 5))
 
 # display time of compression
 compressed_time_label = ttk.Label(root, text="Compressed Time: ")

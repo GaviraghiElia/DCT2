@@ -19,7 +19,6 @@ def test_dct():
     print(mydct.dct(vector))
 
 def test_dctn():
-    print("\n\n test open dctn2")
     mat = np.array([
         [231, 32, 233, 161, 24, 71, 140, 245],
         [247, 40, 248, 245, 124, 204, 36, 107],
@@ -30,57 +29,61 @@ def test_dctn():
         [193, 70, 174, 167, 41, 30, 127, 245],
         [87, 149, 57, 192, 65, 129, 178, 228],
     ])
+    print("\n\n test open dctn2")
     print(dctn(mat, norm='ortho'))
 
     print("test my dct2")
     print(mydct2.dct2(mat))
 
 
-def performance_test(start, nmatrix, incr=1):
-    matrices = []
-
-    for index in range(0, nmatrix * incr, incr):
-        size = index + start
-        problem = np.random.randint(0, 255, size=(size, size))
+def performance_test(start, nmatrix, incr):
+    M = []
+    i = 0
+    while(i <= nmatrix * incr):
+        if i == 0:
+            i = start
+        else:
+            i += incr
+        problem = np.random.randint(0, 255, size=(i, i))
         tic = time.perf_counter()
         dctn(problem, norm='ortho')
         toc = time.perf_counter()
 
-        matrices.append({
-            'size': size,
-            'duration': float(toc - tic),
+        M.append({
+            'size': i,
+            'time': float(toc - tic),
             'type': 'library'
         })
 
-        print('[OPEN] Matrix ({0},{0}) took {1:.4f}ms to complete.'.format(size, float(toc-tic)))
+        print('[OPEN] Matrix ({0},{0}) took {1:.4f}ms to complete.'.format(i, float(toc-tic)))
 
         tic = time.perf_counter()
         mydct2.dct2(problem)
         toc = time.perf_counter()
 
-        matrices.append({
-            'size': size,
-            'duration': float(toc - tic),
+        M.append({
+            'size': i,
+            'time': float(toc - tic),
             'type': 'custom'
         })
 
-        print('[CUSTOM] Matrix ({0},{0}) took {1:.4f}ms to complete.'.format(size, float(toc-tic)))
+        print('[CUSTOM] Matrix ({0},{0}) took {1:.4f}ms to complete.'.format(i, float(toc-tic)))
         print('\n')
 
-    return matrices
+    return M
 
 def plot_results(results):
     df = pd.DataFrame.from_dict(results)
     ax = plt.axes()
-    sns.lineplot(data=df, x='size', y='duration', hue='type', marker='o', ax=ax)
+    sns.lineplot(data=df, x='size', y='time', hue='type', marker='o', ax=ax)
     ax.set_yscale('log')
     plt.show()
 
 
 # Plot style
-sns.set_style('darkgrid')
+sns.set_style('whitegrid')
 test_dct()
 test_dctn()
 
-#results = performance_test(10, 25, 10)
-#plot_results(results)
+results = performance_test(10, 20, 20)
+plot_results(results)
