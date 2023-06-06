@@ -10,94 +10,96 @@ from scipy.fft import dctn, idctn
 from ttkthemes import ThemedTk
 
 def load_image():
-    # Apre una finestra di dialogo per caricare un'immagine
+    # Apre una finestra per caricare un'immagine
     file_path = filedialog.askopenfilename(filetypes=[('BMP files', '*.bmp')])
 
-    # Verifica se un file è stato selezionato
+    # Verifica se il file è stato selezionato
     if file_path:
         # Carica l'immagine selezionata
         img = Image.open(file_path)
 
+        # setta range slider
         m = min(img.height, img.width)
         F_slider.configure(from_=1, to=m)
         d_slider.configure(from_=1, to=m - 2)
+        # setta valore slider
         F_slider.set(int(m / 3))
         d_slider.set(int(m / 3) - 2)
 
         # peso dell'immagine caricata
         original_size = os.path.getsize(file_path)
         original_size_label.configure(text=f"Original Size: {format_size(original_size)}")
+
         # reset dei tempi in caso di caricamento non iniziale
         compressed_time_label.configure(text="Compressed Time: ")
 
         # Mostra l'immagine nella GUI
-        img.thumbnail((1000, 1000))  # Ridimensiona l'immagine per adattarla alla GUI
+        img.thumbnail((800, 800))  # Ridimensiona l'immagine per adattarla alla GUI
         img_tk = ImageTk.PhotoImage(img)
         img_label.configure(image=img_tk)
         img_label.image = img_tk
 
-        # abilitazione bottone per la compressione
-        compress_button.configure(state=tk.NORMAL)  # Abilita il pulsante di compressione
+        # Bottone compressione abilitato
+        compress_button.configure(state=tk.NORMAL)
+        # richiama la funzione compress_button_clicked() quando cliccato
         compress_button.config(command=lambda: compress_button_clicked(file_path))
 
 
 def compress_button_clicked(image_path):
+
     # Ottieni i valori di F e d dai due slider
     F = int(F_slider.get())
     d = int(d_slider.get())
+    # ulteriore check
     if d < 0 | d > F - 2:
         d = F - 2
 
-    # chiamata alla funzione di compressione
+    # misurazione del tempo
     tic = time.perf_counter()
+
+    # chiamata alla funzione di compressione
     compressed_img = compress_image(image_path, F, d)
+
+    # stop tempo e approssimazione
     toc = time.perf_counter()
-    time_compr = round(float(toc - tic), 4)
+    time_compr = round ( float ( toc - tic ) , 4)
     compressed_time_label.configure(text="Compressed Time: " + str(time_compr) + "s")
 
-    # per salvare l'immagine compressa e prenderne la dimensione
-    #get name
-    filename = os.path.splitext(os.path.basename(image_path))[0]
-
     # Mostra l'immagine compressa nella GUI
-    compressed_img.thumbnail((1000, 1000))  # Ridimensiona l'immagine per adattarla alla GUI
+    compressed_img.thumbnail((800, 800))
     compressed_img_tk = ImageTk.PhotoImage(compressed_img)
     compressed_img_label.configure(image=compressed_img_tk)
     compressed_img_label.image = compressed_img_tk
 
 def compress_image(image_path, F, d):
-    # Carica l'immagine
     with open(image_path, 'rb') as f:
-        # Carica l'immagine
+        # se RGB, convertila
         img = Image.open(f).convert('L')
 
     # Ottieni le dimensioni dell'immagine
     width, height = img.size
+    min_dim = min(width, height)
 
-    max_dim = min(width, height)
-
-    # Verifica dei parametri e update degli slider
-    if F > max_dim:
-        F = max_dim
-        F_slider.set(max_dim)
-
+    # Ulteriore verifica dei parametri e update eventuale degli slider
+    if F > min_dim:
+        F = min_dim
+        F_slider.set(min_dim)
     if d > F - 2:
         d = F - 2
         d_slider.set(F - 2)
 
-    # Calcola il numero di blocchi in larghezza e altezza
+    # Calcola il numero di blocchi in larghezza e altezza - arrotonda i valori = pixel in eccesso scartati
     num_blocks_w = int(width / F)
     num_blocks_h = int(height / F)
 
-    # Calculate the new dimensions for the compressed image
+    # dimensione dell'immagine compressa
     new_width = num_blocks_w * F
     new_height = num_blocks_h * F
 
-    # Trasforma l'immagine in un array
+    # Da immagine ad arrampu numpy
     img_arr = np.array(img, dtype=np.float32)
 
-    # pre-allochiamo un array numpy di 0
-    # l'immagine in output verrà croppata
+    # Pre-allochiamo un array numpy di 0
     compressed_arr = np.zeros((new_height, new_width), dtype=np.float32)
 
     # Applica la compressione per ogni blocco
@@ -105,25 +107,24 @@ def compress_image(image_path, F, d):
         for j in range(num_blocks_w):
             # Estrai il blocco corrente
             block = img_arr[i * F:(i + 1) * F, j * F:(j + 1) * F]
-
+            # dct2 sul blocco
             dct_block = dctn(block, norm='ortho')
-
-            # Elimina le frequenze
-            for h in range(F):
-                for k in range(F):
-                    if h + k >= d:
-                        dct_block[h, k] = 0
+            # tronca le alte frequenze d
+            for k in range(F):
+                for l in range(F):
+                    if k + l >= d:
+                        dct_block[k, l] = 0
 
             # Applica la DCT2 inversa
             idctn_block = idctn(dct_block, norm='ortho')
 
-            # Aggiungi il blocco compresso all'immagine finale
+            # Aggiungi il blocco compresso all'array dell'immagine finale
             compressed_arr[i * F : (i + 1) * F, j * F : (j + 1) * F] = idctn_block
 
-    # Arrotonda i valori e li limita nell'intervallo 0-255
+    # Arrotonda i valori nell'intervallo 0-255
     compressed_arr = np.round(compressed_arr).clip(0, 255)
 
-    # Convert the compressed array back to PIL Image
+    # Converti l'array ottenuto in immagine
     compressed_img = Image.fromarray(compressed_arr.astype(np.uint8))
 
     return compressed_img
@@ -151,11 +152,11 @@ load_button.pack()
 image_frame = ttk.Frame(root)
 image_frame.pack()
 
-# Display the original image size
+# Label per il peso dell'immagine originale
 original_size_label = ttk.Label(root, text="Original Size: ")
 original_size_label.pack(padx=10, pady=(0, 5))
 
-# display time of compression
+# Label per il tempo di compressione
 compressed_time_label = ttk.Label(root, text="Compressed Time: ")
 compressed_time_label.pack(padx=10, pady=(0, 5))
 

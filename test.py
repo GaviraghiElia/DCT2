@@ -39,7 +39,7 @@ def test_dctn():
 def performance_test(start, nmatrix, incr):
     M = []
     i = 0
-    while(i <= nmatrix * incr):
+    while i <= nmatrix * incr:
         if i == 0:
             i = start
         else:
@@ -84,6 +84,5 @@ def plot_results(results):
 sns.set_style('whitegrid')
 test_dct()
 test_dctn()
-
 results = performance_test(10, 20, 20)
 plot_results(results)
