@@ -3,18 +3,23 @@ import numpy as np
 
 def dct(vector):
     # lunghezza del vettore
-    l = len(vector)
-    # pre-allocazione
-    c = np.zeros(l)
+    N = len(vector)
 
-    for i in range(l):
+    # pre-allocazione per ottimizzare il codice
+    c = np.zeros(N)
+
+    # ottimizzazione del codice calcolando alpha una sola volta
+    alphaZero = 1 / math.sqrt(N)
+    alphaNotZero = math.sqrt(2 / N)
+
+    for k in range(N):
+        if k == 0:
+            alpha = alphaZero
+        else:
+            alpha = alphaNotZero
         s = 0
-        for j in range(l):
-            s += vector[j] * np.cos(i * np.pi * ((2 * j + 1) / (2 * l)))
-            if i == 0:
-                alpha = 1 / math.sqrt(l)
-            else:
-                alpha = math.sqrt(2 / l)
-            c[i] = alpha * s
+        for i in range(N):
+            s += vector[i] * np.cos(np.pi * k * ((2 * i + 1) / (2 * N)))
+            c[k] = alpha * s
 
     return c

@@ -8,6 +8,7 @@ from PIL import Image, ImageTk
 import numpy as np
 from scipy.fft import dctn, idctn
 from ttkthemes import ThemedTk
+import matplotlib.pyplot as plt
 
 def load_image():
     # Apre una finestra per caricare un'immagine
@@ -34,7 +35,7 @@ def load_image():
         compressed_time_label.configure(text="Compressed Time: ")
 
         # Mostra l'immagine nella GUI
-        img.thumbnail((800, 800))  # Ridimensiona l'immagine per adattarla alla GUI
+        img.thumbnail((500, 500))  # Ridimensiona l'immagine per adattarla alla GUI
         img_tk = ImageTk.PhotoImage(img)
         img_label.configure(image=img_tk)
         img_label.image = img_tk
@@ -66,10 +67,18 @@ def compress_button_clicked(image_path):
     compressed_time_label.configure(text="Compressed Time: " + str(time_compr) + "s")
 
     # Mostra l'immagine compressa nella GUI
-    compressed_img.thumbnail((800, 800))
+    compressed_img.thumbnail((500, 500))
     compressed_img_tk = ImageTk.PhotoImage(compressed_img)
     compressed_img_label.configure(image=compressed_img_tk)
     compressed_img_label.image = compressed_img_tk
+
+    # Mostra gli istogrammi
+    show_original_histogram(image_path, F, d)
+    show_compressed_histogram(compressed_img)
+
+    # Aggiorna la visualizzazione della figura
+    plt.tight_layout()
+    plt.show()
 
 def compress_image(image_path, F, d):
     with open(image_path, 'rb') as f:
@@ -129,6 +138,29 @@ def compress_image(image_path, F, d):
 
     return compressed_img
 
+def show_original_histogram(image_path, F, d):
+    # Calcola l'istogramma dell'immagine originale
+    with open(image_path, 'rb') as f:
+        img = Image.open(f).convert('L')
+    img_arr = np.array(img)
+    hist = np.histogram(img_arr.flatten(), bins=256, range=[0, 256])
+
+    # Visualizza l'istogramma
+    plt.figure()
+    plt.title("Original vs Compressed Image Histogram with F =" + str(F) + " d =" + str(d))
+    plt.xlabel("Pixel Value")
+    plt.ylabel("Frequency")
+    plt.bar(hist[1][:-1], hist[0], width=1, alpha=0.5, label="Original Image")
+
+
+def show_compressed_histogram(compressed_img):
+    # Calcola l'istogramma dell'immagine compressa
+    compressed_arr = np.array(compressed_img)
+    hist = np.histogram(compressed_arr.flatten(), bins=256, range=[0, 256])
+
+    # Visualizza l'istogramma
+    plt.bar(hist[1][:-1], hist[0], width=1, alpha=0.5, label="Compressed Image")
+    plt.legend()
 
 def format_size(size):
     # Convert the size in bytes to KB or MB

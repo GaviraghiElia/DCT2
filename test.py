@@ -1,3 +1,4 @@
+import math
 import time
 
 import matplotlib.pyplot as plt
@@ -36,39 +37,53 @@ def test_dctn():
     print(mydct2.dct2(mat))
 
 
-def performance_test(start, nmatrix, incr):
+def performance_test(start, nmatrix):
     M = []
-    i = 0
-    while i <= nmatrix * incr:
-        if i == 0:
-            i = start
-        else:
-            i += incr
-        problem = np.random.randint(0, 255, size=(i, i))
+    i = 1
+    n = start
+    while i <= nmatrix:
+        i += 1
+        problem = np.random.randint(0, 255, size=(n, n))
         tic = time.perf_counter()
         dctn(problem, norm='ortho')
         toc = time.perf_counter()
 
         M.append({
-            'size': i,
+            'size': n,
             'time': float(toc - tic),
             'type': 'library'
         })
 
-        print('[OPEN] Matrix ({0},{0}) took {1:.4f}ms to complete.'.format(i, float(toc-tic)))
-
-        tic = time.perf_counter()
-        mydct2.dct2(problem)
-        toc = time.perf_counter()
-
         M.append({
-            'size': i,
-            'time': float(toc - tic),
-            'type': 'custom'
+            'size': n,
+            'time': pow(i, 2),
+            'type': 'n^2'
         })
 
-        print('[CUSTOM] Matrix ({0},{0}) took {1:.4f}ms to complete.'.format(i, float(toc-tic)))
-        print('\n')
+        w = pow(i, 2) * math.log(i, 2)
+
+        M.append({
+            'size': n,
+            'time': w,
+            'type': 'n^2 log n'
+        })
+
+        print('[OPEN] Matrix ({0},{0}) took {1:.4f}ms to complete.'.format(n, float(toc-tic)))
+
+        #tic = time.perf_counter()
+        #mydct2.dct2(problem)
+        #toc = time.perf_counter()
+
+        #M.append({
+        #    'size': n,
+        #    'time': float(toc - tic),
+        #    'type': 'custom'
+        #})
+
+        #print('[CUSTOM] Matrix ({0},{0}) took {1:.4f}ms to complete.'.format(n, float(toc-tic)))
+        #print('\n')
+
+        n = n * 2
 
     return M
 
@@ -84,5 +99,5 @@ def plot_results(results):
 sns.set_style('whitegrid')
 test_dct()
 test_dctn()
-results = performance_test(10, 20, 20)
-plot_results(results)
+#results = performance_test(400, 6)
+#plot_results(results)
