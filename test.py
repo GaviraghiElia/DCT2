@@ -99,5 +99,5 @@ def plot_results(results):
 sns.set_style('whitegrid')
 test_dct()
 test_dctn()
-#results = performance_test(400, 6)
-#plot_results(results)
+results = performance_test(400, 6)
+plot_results(results)
