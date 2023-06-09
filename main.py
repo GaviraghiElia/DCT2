@@ -52,8 +52,8 @@ def compress_button_clicked(image_path):
     F = int(F_slider.get())
     d = int(d_slider.get())
     # ulteriore check
-    if d < 0 | d > F - 2:
-        d = F - 2
+    if d < 0 | d > 2*F - 2:
+        d = 2*F - 2
 
     # misurazione del tempo
     tic = time.perf_counter()
@@ -73,8 +73,8 @@ def compress_button_clicked(image_path):
     compressed_img_label.image = compressed_img_tk
 
     # Mostra gli istogrammi
-    show_original_histogram(image_path, F, d)
-    show_compressed_histogram(compressed_img)
+    #show_original_histogram(image_path, F, d)
+    #show_compressed_histogram(compressed_img)
 
     # Aggiorna la visualizzazione della figura
     plt.tight_layout()
@@ -93,9 +93,9 @@ def compress_image(image_path, F, d):
     if F > min_dim:
         F = min_dim
         F_slider.set(min_dim)
-    if d > F - 2:
-        d = F - 2
-        d_slider.set(F - 2)
+    if d > 2*F - 2:
+        d = 2*F - 2
+        d_slider.set(2*F - 2)
 
     # Calcola il numero di blocchi in larghezza e altezza - arrotonda i valori = pixel in eccesso scartati
     num_blocks_w = int(width / F)
