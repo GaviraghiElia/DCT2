@@ -22,7 +22,7 @@ def load_image():
         # setta range slider
         m = min(img.height, img.width)
         F_slider.configure(from_=1, to=m)
-        d_slider.configure(from_=1, to=m - 2)
+        d_slider.configure(from_=1, to=2*m - 2)
         # setta valore slider
         F_slider.set(int(m / 3))
         d_slider.set(int(m / 3) - 2)
@@ -75,10 +75,9 @@ def compress_button_clicked(image_path):
     # Mostra gli istogrammi
     #show_original_histogram(image_path, F, d)
     #show_compressed_histogram(compressed_img)
-
     # Aggiorna la visualizzazione della figura
-    plt.tight_layout()
-    plt.show()
+    #plt.tight_layout()
+    #plt.show()
 
 def compress_image(image_path, F, d):
     with open(image_path, 'rb') as f:
