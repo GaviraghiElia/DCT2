@@ -21,7 +21,7 @@ def load_image():
 
         # setta range slider
         m = min(img.height, img.width)
-        F_slider.configure(from_=1, to=m)
+        F_slider.configure(from_=3, to=m)
         d_slider.configure(from_=1, to=2*m - 2)
         # setta valore slider
         F_slider.set(int(m / 3))
